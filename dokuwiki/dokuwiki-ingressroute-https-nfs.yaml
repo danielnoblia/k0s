@@ -1,0 +1,42 @@
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: Middleware
+metadata:
+  name: nginx-redirect-scheme
+spec:
+  redirectScheme:
+    scheme: https
+    permanent: true
+    port: "443"
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dokuwiki-http
+spec:
+  entryPoints:
+    - web
+  routes:
+    - match: Host(`dokuwiki.example.com`) 
+      kind: Rule
+      middlewares:
+        - name: nginx-redirect-scheme
+      services:
+        - name: dokuwiki
+          port: 80
+---
+apiVersion: traefik.containo.us/v1alpha1
+kind: IngressRoute
+metadata:
+  name: dokuwiki-https
+spec:
+  entryPoints:
+    - websecure
+  routes:
+    - match: Host(`dokuwiki.example.com`)
+      kind: Rule
+      services:
+        - name: dokuwiki
+          port: 80
+  tls:
+    certResolver: pebble
