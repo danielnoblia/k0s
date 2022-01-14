@@ -2,7 +2,8 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: dokuwiki-redirect-scheme
+  name: prometheus-redirect-scheme
+  namespace: monitoring
 spec:
   redirectScheme:
     scheme: https
@@ -12,31 +13,33 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: dokuwiki-http
+  name: prometheus-http
+  namespace: monitoring
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`dokuwiki.example.com`) 
+    - match: Host(`prometheus.example.com`)
       kind: Rule
       middlewares:
-        - name: dokuwiki-redirect-scheme
+        - name: prometheus-redirect-scheme
       services:
-        - name: dokuwiki
-          port: 80
+        - name: k0s-kube-prometheus-stack-prometheus
+          port: 9090
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: dokuwiki-https
+  name: prometheus-https
+  namespace: monitoring
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`dokuwiki.example.com`)
+    - match: Host(`prometheus.example.com`)
       kind: Rule
       services:
-        - name: dokuwiki
-          port: 80
+        - name: k0s-kube-prometheus-stack-prometheus
+          port: 9090
   tls:
     certResolver: pebble

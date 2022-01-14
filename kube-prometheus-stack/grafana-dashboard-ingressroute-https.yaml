@@ -2,7 +2,8 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: dokuwiki-redirect-scheme
+  name: grafana-redirect-scheme
+  namespace: monitoring
 spec:
   redirectScheme:
     scheme: https
@@ -12,31 +13,33 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: dokuwiki-http
+  name: grafana-dashboard-http
+  namespace: monitoring
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`dokuwiki.example.com`) 
+    - match: Host(`grafana.example.com`)
       kind: Rule
       middlewares:
-        - name: dokuwiki-redirect-scheme
+        - name: grafana-redirect-scheme
       services:
-        - name: dokuwiki
+        - name: k0s-kube-prometheus-stack-grafana
           port: 80
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: dokuwiki-https
+  name: grafana-dashboard-https
+  namespace: monitoring
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`dokuwiki.example.com`)
+    - match: Host(`grafana.example.com`)
       kind: Rule
       services:
-        - name: dokuwiki
+        - name: k0s-kube-prometheus-stack-grafana
           port: 80
   tls:
     certResolver: pebble

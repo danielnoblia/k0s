@@ -2,7 +2,8 @@
 apiVersion: traefik.containo.us/v1alpha1
 kind: Middleware
 metadata:
-  name: dokuwiki-redirect-scheme
+  name: longhorn-redirect-scheme
+  namespace: longhorn-system
 spec:
   redirectScheme:
     scheme: https
@@ -12,31 +13,33 @@ spec:
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: dokuwiki-http
+  name: longhorn-http
+  namespace: longhorn-system
 spec:
   entryPoints:
     - web
   routes:
-    - match: Host(`dokuwiki.example.com`) 
+    - match: Host(`longhorn.example.com`) 
       kind: Rule
       middlewares:
-        - name: dokuwiki-redirect-scheme
+        - name: longhorn-redirect-scheme
       services:
-        - name: dokuwiki
+        - name: longhorn-frontend
           port: 80
 ---
 apiVersion: traefik.containo.us/v1alpha1
 kind: IngressRoute
 metadata:
-  name: dokuwiki-https
+  name: longhorn-https
+  namespace: longhorn-system
 spec:
   entryPoints:
     - websecure
   routes:
-    - match: Host(`dokuwiki.example.com`)
+    - match: Host(`longhorn.example.com`)
       kind: Rule
       services:
-        - name: dokuwiki
+        - name: longhorn-frontend
           port: 80
   tls:
     certResolver: pebble
